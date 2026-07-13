@@ -55,7 +55,7 @@ model = ChatNVIDIA(
 model_with_tools = model.bind_tools(tools)
 
 
-@traceable(name = "Run Agent")
+@traceable(name = "W Agent")
 def run_agent(query: str, max_step = 5):
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),

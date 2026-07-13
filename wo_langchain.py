@@ -4,13 +4,17 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import time
 import json
+from langsmith import traceable
+from langsmith.wrappers import wrap_openai
 
 load_dotenv()
 client = OpenAI(
     base_url = "https://integrate.api.nvidia.com/v1",
     api_key = os.getenv("NVDIA_API_KEY")
 )
+client = wrap_openai(client)
 
+@traceable(run_type = "tool", name = "Tra cứu giá quả")
 def get_fruit_price(query: str) -> str:
     """
     Get fruit price by fruit name
@@ -24,6 +28,7 @@ def get_fruit_price(query: str) -> str:
         
     return "The fruit does not exits"
 
+@traceable(run_type = "tool", name = "Áp mã giảm giá")
 def get_fruit_price_discount(fruit: str, price: str) -> str:
     """
     Get the fruit's price after discount
@@ -69,6 +74,7 @@ Final Answer: [Câu trả lời hoàn chỉnh, chi tiết dành cho người dù
 Bắt đầu nhiệm vụ!
 """
 
+@traceable(run_type = "chain",name = "W/O Agent")
 def run_react_agent(user_question:str, max_steps = 5):
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
@@ -78,7 +84,6 @@ def run_react_agent(user_question:str, max_steps = 5):
     for step in range(max_steps):
         print("="*15,"STEP ",step+1,"="*15)
 
-        
         response = client.chat.completions.create(
         model="qwen/qwen3-next-80b-a3b-instruct",
         messages=messages,
